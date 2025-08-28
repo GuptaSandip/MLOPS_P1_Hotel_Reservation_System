@@ -39,7 +39,7 @@ pipeline {
                     script{
                         echo 'Building and pishing Dokcer image to GCR.....'
                         sh '''
-                        export PATH=$PATH:$(GCLOUD_PATH)
+                        export PATH=$PATH:${GCLOUD_PATH}
 
                         gcloud auth activate-service-account --key-file=${Google_Application_Credentials}
 
