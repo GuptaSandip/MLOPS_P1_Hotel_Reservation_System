@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent any 
 
     environment {
         VENV_DIR = 'venv'
@@ -8,12 +8,13 @@ pipeline {
     }
 
     stages {
-        stage('Clone GitHub Repo') {
+        stage('Cloning GitHub repo to Jenkins') {
             steps {
                 script {
-                    echo 'Cloning GitHub repository...'
+                    echo 'Cloning GitHub repo to Jenkins......'
                     checkout scmGit(
                         branches: [[name: '*/main']],
+                        extensions: [],
                         userRemoteConfigs: [[
                             credentialsId: 'github-token',
                             url: 'https://github.com/GuptaSandip/MLOPS_P1_Hotel_Reservation_System.git'
@@ -23,58 +24,38 @@ pipeline {
             }
         }
 
-        stage('Set up virtualenv and install dependencies') {
+        stage('Setting up virtual environment and installing dependencies') {
             steps {
                 script {
-                    echo 'Creating virtual environment and installing dependencies...'
+                    echo 'Setting up virtual environment and installing dependencies'
                     sh '''
-                        python -m venv ${VENV_DIR}
-                        . ${VENV_DIR}/bin/activate
-                        pip install --upgrade pip
-                        pip install -e .
+                    python -m venv ${VENV_DIR}
+                    . ${VENV_DIR}/bin/activate
+                    pip install --upgrade pip
+                    pip install -e .
                     '''
                 }
             }
         }
 
-        stage('Train Model') {
+        stage('Building and pushing Docker image to GCR') {
             steps {
-                script {
-                    echo 'Running training pipeline...'
-                    sh '''
-                        . ${VENV_DIR}/bin/activate
-                        python pipeline/training_pipeline.py
-                    '''
-                }
-            }
-        }
-
-        stage('Build and Push Docker Image to GCR') {
-            steps {
-                withCredentials([file(credentialsId: 'mlops-p1-gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                withCredentials([file(credentialsId: 'mlops-p1-gcp-key', variable: 'Google_Application_Credentials')]) {
                     script {
-                        echo 'Building and pushing Docker image to GCR...'
+                        echo 'Building and pushing Docker image to GCR.....'
                         sh '''
-                            export PATH=$PATH:${GCLOUD_PATH}
-                            gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
-                            gcloud config set project ${GCP_PROJECT}
-                            gcloud auth configure-docker --quiet
+                        export PATH=$PATH:${GCLOUD_PATH}
 
-                            docker build -t gcr.io/${GCP_PROJECT}/mlops-p1:latest .
-                            docker push gcr.io/${GCP_PROJECT}/mlops-p1:latest
+                        gcloud auth activate-service-account --key-file=${Google_Application_Credentials}
+                        gcloud config set project ${GCP_PROJECT}
+                        gcloud auth configure-docker --quiet
+
+                        docker build -t gcr.io/${GCP_PROJECT}/mlops-p1:latest .
+                        docker push gcr.io/${GCP_PROJECT}/mlops-p1:latest
                         '''
                     }
                 }
             }
-        }
-    }
-
-    post {
-        failure {
-            echo "Pipeline failed!"
-        }
-        success {
-            echo "Pipeline completed successfully."
         }
     }
 }
