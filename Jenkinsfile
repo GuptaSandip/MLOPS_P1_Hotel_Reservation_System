@@ -57,5 +57,31 @@ pipeline {
                 }
             }
         }
+
+
+            stage('Deploy to google cloud run') {
+            steps {
+                withCredentials([file(credentialsId: 'mlops-p1-gcp-key', variable: 'Google_Application_Credentials')]) {
+                    script {
+                        echo 'Deploy to google cloud run.......'
+                        sh '''
+                        export PATH=$PATH:${GCLOUD_PATH}
+
+                        gcloud auth activate-service-account --key-file=${Google_Application_Credentials}
+
+                        gcloud config set project ${GCP_PROJECT}
+
+                        gcloud run deploy mlops-p1 \
+                            --image=gcr.io/${GCP_PROJECT}/mlops-p1:latest \ 
+                            --platform=managed \ 
+                            --region=us-central1 \
+                            --allow=unauthenticated
+
+                        '''
+                    }
+                }
+            }
+        }
+
     }
 }
