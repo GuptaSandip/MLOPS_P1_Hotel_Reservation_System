@@ -3,6 +3,7 @@
 This MLOps project predicts whether a hotel reservation will be **canceled** based on customer and booking features. It includes a full ML pipeline from data ingestion to deployment using CI/CD practices and Docker, and a user-friendly web interface built with Flask.
 
 🌐 **Live Demo**: [Click here to try it!](https://mlops-p1-982544224719.us-central1.run.app/)
+- Note: May be this link will not work in future.
 
 ---
 
@@ -43,8 +44,9 @@ The frontend allows users to enter details like:
 
 🔮 After clicking **"Predict"**, the app displays whether the reservation is **likely to be canceled or not**.
 
-![UI Screenshot](https://mlops-p1-982544224719.us-central1.run.app/static/screenshot.png) *(replace with hosted image if needed)*
+## UI Screenshot
 
+<img width="1892" height="1010" alt="Image" src="https://github.com/user-attachments/assets/f3d25a77-5c14-49fc-838f-3280ba5011fd" />
 ---
 
 ## 🧠 Machine Learning Pipeline
